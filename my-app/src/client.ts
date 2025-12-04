@@ -19,3 +19,4 @@ if (res.ok) {
 } else {
     console.log(res.status, 'error')
 }
+
