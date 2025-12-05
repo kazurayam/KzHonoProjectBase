@@ -22,3 +22,16 @@ $ bun run client
 ```
 
 clientプロセスがholdする。それを停止するには Ctrl+C する。
+
+# HTMLを応答するServerを作って、応答をテストする、JSDomを利用する
+
+
+```
+$ cd Hono-API-Server
+$ bun create hono@latest my-html-app
+```
+bun
+yes
+bun
+
+See https://hono-ja.pages.dev/docs/guides/jsx
