@@ -7,24 +7,14 @@ import {beforeEach, describe, expect, test} from 'bun:test'
 import {renderToString} from 'hono/jsx/dom/server';
 
 // '@testing-library/dom' provides utilities to query the JSDom document
-import {screen} from '@testing-library/dom';
-import {JSDOM} from 'jsdom';
+import { screen } from '@testing-library/dom';
 
 // 1. Define a sample Hono JSX component
 const Greeting = ({ name } : { name: string}) => {
     return <div>Hello, {name}!</div>
 };
 
-// 2. Set up JSDom environment before each test
-let dom: JSDOM;
-let document: Document;
-
-beforeEach(() => {
-    dom = new JSDOM('<!DOCTYPE html><body><div id="app"></div></body>');
-    document = dom.window.document;
-    // Ensure the global environment uses the JSDom document
-    Object.defineProperty(global, 'document', { value: document });
-});
+// 2. ./bunfig.toml & ./happydom.ts tunes the global document accessible without browser runtime
 
 describe('Greeting Component', () => {
     test('renders the correct name', () => {
