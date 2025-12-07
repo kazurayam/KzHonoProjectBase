@@ -122,4 +122,48 @@ Key Considerations
 Server-Side Rendering (SSR) in Tests: Hono's primary use of JSX is often for SSR. The example above captures the rendered HTML string and manually inserts it into the JSDom document.body for testing purposes.
 Client Components (hono/jsx/dom): If you are using Hono's client-side components with hooks like useState, you would typically mount them differently, potentially leveraging the @testing-library/react (which builds on DOM testing library and JSDom) or similar specific utilities that handle the client-side lifecycle and re-rendering.
 Testing Routes: To test components rendered within a full Hono application route, the official Hono testing guide recommends using the app.request() method and asserting on the response text, rather than using JSDom to inspect the body content.
-For more details on testing Hono applications, refer to the official Hono Testing documentation and Hono JSX documentation. 
+For more details on testing Hono applications, refer to the official Hono Testing documentation and Hono JSX documentation.
+
+
+## PlaywrightによるWeb UIテスト
+
+See https://gist.github.com/toms74209200/d58c127ffa88d7f508e6bf117aaa3b90
+
+```
+$ cd Hono-API-Server
+$ mkdir my-playwright-project
+$ bun create playwright
+...
+$ ls
+node_modules            playwright.config.ts
+package-lock.json       tests
+package.json
+```
+
+ブラウザをInstall
+```
+$ bun x playwright install
+```
+
+依存関係のインストール
+```
+$ bun x playwright install-deps
+```
+
+package.jsonファイルを修正
+```
+  "scripts": {
+    "test:e2e": "playwright test",
+    "show-report": "playwright show-report"
+  },
+```
+
+テストを実行する
+```
+$ bun run test:e2e
+```
+
+レポートをブラウザで開く
+```
+$ bun run playwright show-report
+```
