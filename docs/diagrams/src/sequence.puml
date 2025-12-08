@@ -1,0 +1,26 @@
+@startuml sequence
+
+actor       Tester             as tester
+participant gendocs.sh         as gendocs
+participant "docs/adoc2md.sh"  as adoc2md
+participant "git push"         as gitpush
+database    "docs/index_.adoc" as indexadoc
+database    "docs/index.md"    as indexmd
+database    "GitHub Repos"     as repos
+
+== authoring ==
+tester      -> indexadoc     : author it
+
+== generating ==
+tester      -> gendocs       : run it
+gendocs     -> adoc2md       : call it
+adoc2md     <- indexadoc     : read it
+adoc2md     -> indexmd       : write it
+
+== publishing ==
+tester      -> gitpush       : run it
+indexmd     -> gitpush       : read it
+gitpush     -> repos         : push it
+tester      <- repos         : view it
+@enduml
+
