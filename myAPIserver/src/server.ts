@@ -95,7 +95,7 @@ app.doc31("/doc", {
 });
 
 // ドキュメントをブラウザで表示
-app.get("/ui", swaggerUI({url: "/doc"}))
+app.get("/ui", swaggerUI({ url: "/doc" }))
 
 // AppType型を定義し、それをexportしてクライアントが使えるようにする
 export type AppType = typeof sampleRoutes

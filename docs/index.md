@@ -4,48 +4,274 @@
 
 - date: Dec, 2025
 
-kazurayamがHonoを使ったプロジェクトを自作するにあたって雛形となるリポジトリを作成しました。
-BunやHonoなど基盤となるソフトウェアをインストールし設定して動作確認するまでの手順をまとめています。
+わたくしkazurayamがこれからHonoを使ったプロジェクトを自作するにあたって雛形として役立つプロジェクトを作り、GitHubリポジトリにしました。Bun、Hono、JSXなど基盤となるソフトウェアをインストールし、プロジェクトを作って、サンプルとしてのアプリが動作することを確認するまでの手順をまとめています。
 
-## 雛形の概要
+## 動機
 
-1.  macOXでやる。Windowsに関しては言及しない。
+[Honoの7つのコンセプト, 原文: Hono: The Fastest Web Framework for the Edge](https://zenn.dev/yusukebe/articles/1f3ac394f31f3b) を読んでHonoに興味を持ちました。HonoはEdgeサーバーで動作することを念頭に置いて設計された軽量なWebアプリケーションフレームワークです。Honoを使ってAPIサーバーやWebサーバーを構築し、CloudFlare Workersなどのエッジサーバーへ配備してみたいと思いました。
 
-2.  JavaScriptランタイムとしてBunを使用する。Node.jsではなく。
+## KzHonoProjectBaseの概要
 
-3.  WebフレームワークとしてHonoを使用する。Expressではなく。
+1.  macOXで仕事する。 LinuxやWindowsは考慮しない。
 
-4.  TypeScriptでコーディングする。
+2.  JavaScriptランタイムBunを使用する。Node.jsではなく。
 
-5.  Bunに組み込まれたビルドツールを使う。Viteではなく。
+3.  TypeScriptでコーディングする。JavaScriptではなく。
 
-6.  JSONを応答するAPIサーバとHTMLを応答するWebサーバの二つのサーバを作る。
+4.  WebアプリケーションのフレームワークHonoを使用する。Expressではなく。
 
-7.  サーバーサイドでJSXをレンダリングする。クライアントサイドのReactは使わない。
+5.  JSONを応答するAPIサーバとHTMLを応答するWebサーバの二つのサーバを作る。
+
+6.  Bunに組み込まれたビルドツールを使う。Next.jsやViteではなく。
+
+7.  サーバーサイドでJSXをレンダリングする。そのためにReactは無くても大丈夫だからReactは使わない。
 
 8.  ユニットテストをする。Bunの組み込みテストフレームワークを使用する。
 
 9.  E2Eテストをする。Playwrightを使用する。
 
-10. CloudFlare Worksを使ってエッジサーバーへ配備する。
+10. サンプルアプリをエッジサーバーへ配備する。CloudFlare Worksを使う。
+
+なぜこういう選択をしたか？の理由は説明しません。
 
 ## Bunのインストール
 
 参考情報: [Bun / Installation](https://bun.com/docs/installation)
 
-    curl -fsSL https://bun.com/install | bash
+Bunをインストールする
 
-## Honoのインストール
+    $ cd ~
+    $ curl -fsSL https://bun.com/install | bash
+    ######################################################################## 100.0%
+    bun was installed successfully to ~/.bun/bin/bun
+    Run 'bun --help' to get started
 
-参考情報: [Hono / Getting Started](https://hono.dev/docs/getting-started)
+Bunのバージョンを目視する
 
-    bun add hono
+    $ bun --version
+    1.3.4
 
-## APIサーバを作成する
+## APIサーバを作る
 
-## Webサーバを作成する
+["TypeScript初心者の私がHonoでバックエンドサーバー構築してみた 〜RPCからテストまで" by ゆず at Zenn](https://zenn.dev/yuzunosk55/articles/09275c72cf051b)を参考にした。APIサーバのサンプルコードをコピペさせてもらった。
 
-## エッジサーバへ配備する
+まずプロジェクトを格納するディレクトリを作ろう
+
+    $ cd ~/tmp
+    $ mkdir MyHonoApps
+    $ cd MyHonoApps
+
+このディレクトリを $REPO と書き表すことにする。
+
+$REPO の中で下記のコマンドを実行する。
+
+    $ bun create hono@latest myAPIserver
+
+`? Which template do you want to use?` と聞かれるので `bun` を選択する。
+
+`? Do you want to install project dependencies now?` と聞かれるので `Yes` を選択する。
+
+`? Which package manager do you want to use?` と聞かれるので `bun` を選択する。
+
+    $ bun create hono@latest myAPIserver
+    create-hono version 0.19.4
+    ✔ Using target directory … myAPIserver
+    ✔ Which template do you want to use? cloudflare-workers
+    ✔ Do you want to install project dependencies? Yes
+    ✔ Which package manager do you want to use? bun
+    ✔ Cloning the template
+    ✔ Installing project dependencies
+    🎉 Copied project files
+    Get started with: cd myAPIserver
+
+すると `myAPIserver` というディレクトリが作成される。
+
+    :~/tmp/MyHonoApps/myAPIserver
+    $ tree -L 2
+    .
+    ├── bun.lock
+    ├── node_modules
+    │   ├── @types
+    │   ├── bun-types
+    │   ├── hono
+    │   └── undici-types
+    ├── package.json
+    ├── README.md
+    ├── src
+    │   └── index.ts
+    └── tsconfig.json
+
+    7 directories, 5 files
+
+\`myAPIserver\`というディレクトリが作られる。その中にcdして\`bun install\`コマンドを実行しよう。すると与えられた\`package.json\`に従ってライブラリがインストールされる。
+
+    $ cd myAPIserver
+    $ bun install
+
+`src/index.ts` をエディタで開いてみよう。下記のコードが与えられているはずだ。
+
+    import { Hono } from 'hono'
+
+    const app = new Hono()
+
+    app.get('/', (c) => {
+      return c.text('Hello Hono!')
+    })
+
+    export default app
+
+下記のコマンドを実行するとサーバーが立ち上がるはずだ。
+
+    $ cd $REPO/myAPIserver
+    $ bun run --hot src/index.ts
+    Started development server: http://localhost:3000
+
+<http://127.0.0.1:3000/> をブラウザで開けばこんな画面が見られるはずだ。
+
+<figure>
+<img src="https://kazurayam.github.io/KzHonoProjectBase/images/myAPIserver_1_index_initial.png" alt="myAPIserver 1 index initial" />
+</figure>
+
+以上でごく単純なHTTPサーバーを立ち上げることができた。Ctrl+Cでサーバーを停止しよう。
+
+次にJSONを応答するAPIサーバのコードを開発しよう。
+
+\`src/server.ts\`をエディタで開き、下記のコードを記述しよう。このコードを書くにあたって [Zod + OpenAPI](https://hono.dev/examples/zod-openapi) を参考にした。
+
+[myAPIserver/src/server.ts](https://github.com/kazurayam/KzHonoProjectBase/tree/master/myAPIserver/src/server.ts)
+
+    [source,typescript]
+    ----
+    import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
+    import { swaggerUI } from '@hono/swagger-ui';
+
+    const app = new OpenAPIHono();
+
+    // 適当なテストデータ
+    const users = [
+        {id: 1, name: 'taro', age: 15},
+        {id: 2, name: 'hanako', age: 20},
+    ]
+
+    /**
+     * ユーザーを作成するためのリクエストのschema
+     */
+    const reqCreateUserSchema = z.object({
+        name: z.string().min(1)
+            .openapi({
+                description: 'ユーザの名前',
+                example: 'taro',
+            }),
+        age: z.number().openapi({
+            description: 'ユーザの年齢',
+            example: 15,
+        }),
+    }).openapi('reqCreateUserSchema');
+
+    /**
+     * エラーを返すレスポンスのschema
+     */
+    const resErrorSchema = z.object({
+        code: z.number(),
+        message: z.string(),
+    });
+
+    /**
+     * ユーザ情報を返すレスポンスのschema
+     */
+    const resUserSchema = z.object({
+        id: z.number(),
+        name: z.string(),
+        age: z.number(),
+    });
+
+    // API
+    const sampleRoutes = app
+        .openapi(
+            createRoute({
+                method: 'post',
+                path: '/api/users',
+                request: {
+                    body: {
+                        content: {
+                            'application/json': {
+                                schema: reqCreateUserSchema,
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    200: {
+                        description: 'ユーザー情報を返す',
+                        content: {
+                            'application/json': {
+                                schema: resUserSchema,
+                            }
+                        }
+                    },
+                    400: {
+                        description: 'リクエストに誤りがある',
+                        content: {
+                            'application/json': {
+                                schema: resErrorSchema,
+                            }
+                        }
+                    }
+                }
+            }),
+            //第二引数にリクエスト・ハンドラーを記述する
+            async (c) => {
+                // スキーマに基づいてリクエストを検証する
+                // パスした場合にのみnameとageのデータを取得できる
+                const { name, age } = c.req.valid('json');
+                const user = {id: users.length + 1, name, age };
+                users.push(user);
+                return c.json(user, 200)
+            });
+
+    // ドキュメントを生成
+    app.doc31("/doc", {
+        openapi: "3.1.0",
+        info: {
+            version: "1.0.0",
+            title: "Sample API Document",
+        },
+    });
+
+    // ドキュメントをブラウザで表示
+    app.get("/ui", swaggerUI({ url: "/doc" }))
+
+    // AppType型を定義し、それをexportしてクライアントが使えるようにする
+    export type AppType = typeof sampleRoutes
+
+    export default app
+    ----
+
+次に\`myAPIserver/package.json\`をエディタで開き、\`scripts\`セクションに下記の行を追加しよう。
+
+      "scripts": {
+        "dev": "bun run --hot src/server.ts",
+
+ターミナルで次のコマンドを実行しよう。HTTPサーバが立ち上がる。
+
+    $ cd $REPO/myAPIserver
+    $ bun dev
+
+ブラウザで下記のURLを開いてみよう。
+
+- <http://127.0.0.1/ui>
+
+### エッジサーバへ配備する
+
+### ユニットテストをする
+
+## Webサーバを作る
+
+### JSXを使えるようにする
+
+### ユニットテストをする、documentオブジェクトにアクセスしながら
+
+### E2Eテストをする
 
 ## Lorem ipsum
 

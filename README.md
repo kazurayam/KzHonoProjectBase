@@ -1,8 +1,7 @@
 # Kazurayam's Hono Project Base
 
-JavaScriptランタイム [Bun](https://bun.com/) の上で
-Webアプリケーション・フレームワーク [Hono](https://hono.dev/) を基盤として
-kazurayam がWebアプリを自作するにあたって出発点となるプロジェクトの雛形。
+kazurayam がTypeScriptでWebアプリを自作するにあたって出発点となるプロジェクトの雛形。
+JavaScriptランタイム [Bun](https://bun.com/) を使う。
+Webアプリケーション・フレームワーク [Hono](https://hono.dev/) を基盤とする。
 
 -> [本編](https://kazurayam.github.io/KazurayamsHonoProjectBase/)
-
