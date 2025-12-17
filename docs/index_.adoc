@@ -1,5 +1,7 @@
 :REPOSITORY_TOP_URL: https://github.com/kazurayam/KzHonoProjectBase
 :REPOSITORY_myAPIserver_URL: {REPOSITORY_TOP_URL}/tree/master/myAPIserver
+:PAGE_TOP_URL: https://kazurayam.github.io/KzHonoProjectBase
+
 
 = Kazurayam's Hono Base Project
 
@@ -143,7 +145,7 @@ Started development server: http://localhost:3000
 
 http://127.0.0.1:3000/ をブラウザで開けばこんな画面が見られるはずだ。
 
-image::https://kazurayam.github.io/KzHonoProjectBase/images/myAPIserver_1_index_initial.png[]
+image::{PAGE_TOP_URL}/images/myAPIserver_1_index_initial.png[]
 
 以上でごく単純なHTTPサーバーを立ち上げることができた。Ctrl+Cでサーバーを停止しよう。
 
@@ -458,24 +460,32 @@ To open last HTML report run:
 
 `bun report`コマンドを実行するとPlaywrightが生成したHTMLレポートがブラウザで開かれる。
 
-image::
+image::{PAGE_TOP_URL}/images/myWEBserver_2_show-report.png[]
+
+myWEBserverに対するE2Eテストが動いた。
 
 == エッジサーバに配備しよう
 
-CloudFlare Workersに配備しよう。次のドキュメントを参考にした。
+myWEBserverをCloudFlare Workersに配備しよう。次のドキュメントを参考にした。
 
 - link:https://hono.dev/docs/deployments/cloudflare-workers[Hono公式ドキュメント "Cloudflare Workers"]
 
-=== CloudFlare Workersアカウントを作成する
+=== Cloudflareに自分用のアカウントを作成する
+
+ブラウザで下記のURLを開きCloundflareアカウントを登録した。
+
+- https://dash.cloudflare.com/sign-up/workers-and-pages
+
+image::{PAGE_TOP_URL}/images/Cloudflare-Dashboard-Manage-Your-Account.png[]
+
 
 CloudFlare Workersのアカウントを作成し、APIトークンを取得しよう。
 
-OSの環境変数として `CLOUDFLARE_API_TOKEN` を設定しよう。.profileなどに書いておくと良い。
+OSの環境変数 `CLOUDFLARE_API_TOKEN` を作ってそこにAPIトークンを設定しよう。`.bash_profile` に書いておくと良い。
+
 
 
 === CloudFlare Workersの設定を行う
-
-
 
 CloudFlareのダッシュボードでWorkersの設定を行う。
 

@@ -517,13 +517,13 @@ WEBサーバを立ち上げよう。
 
 ### happy-domを使う
 
-上記のテストは JavaScript組み込みの documentオブジェクトを参照している。ブラウザ内蔵のJavaScriptランタイムの上では documentオブジェクトが参照できるが、Node.jsには documentオブジェクトが組み込まれていない。だからNode.jsでdocumentオブジェクトを参照するテストを書きたければ JSDom を利用するのが常道だ。ところがいまわたくしkazurayamはNode.jsでなくBunの上でdocumentオブジェクトを参照するテストを書きたい。試してみてわかったのだが、JSDomはBunでは動かない。さて、どうする？
+上記のテストは JavaScript組み込みの documentオブジェクトを参照している。ブラウザ内蔵のJavaScriptランタイムの上では documentオブジェクトが参照できるが、Node.jsには documentオブジェクトが組み込まれていない。だからNode.jsでdocumentオブジェクトを参照するテストを書きたければ JSDom を利用するのが常道だ。ところがいまわたくしkazurayamはNode.jsでなくBunの上でdocumentオブジェクトを参照するテストを書きたい。試してみてわかったのだが、JSDomはBunのうえでは動かない。さて、どうする？
 
-答えは "happy-domを使え" だ。下記のBunドキュメントを参照のこと。
+答えは "happy-domを使え" だ。下記のドキュメントを参照せよ。
 
 - [Write browser DOM tests with Bun and happy-dom](https://bun.com/docs/guides/test/happy-dom)
 
-このドキュメントの指図にしたがって `happydom.ts` と `bunfig.toml` を書いた。
+このドキュメントの指図にしたがって `myWEBserver/happydom.ts` と `myWEBserver/bunfig.toml` を書いた。
 
     // happydom.ts
     import { GlobalRegistrator } from "@happy-dom/global-registrator";
@@ -534,10 +534,167 @@ WEBサーバを立ち上げよう。
     preload = ["./happydom.ts"]
     root = "src"
 
-`bun test` コマンドはユーザのテストを実行する前に `happydom.ts` を実行する。するとhappy-domが実装したモノが `document` オブジェクトとして参照可能になる。
+この設定があると `bun test` コマンドはユーザのテストを実行する前に `happydom.ts` を実行する。するとhappy-domが実装したモノが `document` オブジェクトとして参照可能になる。Bunの上で documentオブジェクトを参照するテストが書けるようになる。
 
 ### E2Eテストをする
 
-HTMLを応答するWebサーバをWebブラウザを介してE2Eテストしよう。Playwrightを使おう。
+HTMLを応答するWebサーバをWebブラウザを介してE2Eテストしよう。Playwrightを使おう。下記のドキュメントの設定を参考にした。
+- [Playwright Test/Configuration](https://playwright.dev/docs/test-configuration)
+
+#### プロジェクトにPlaywrightをインストールする
+
+Playwrightをインストールして、設定ファイルとサンプルコードを生成しよう。
+
+    $ cd $REPO/myWEBserver
+    $ bun create playwright
+    Getting started with writing end-to-end tests with Playwright:
+    Initializing project in '.'
+    ✔ Where to put your end-to-end tests? · e2e
+    ✔ Add a GitHub Actions workflow? (Y/n) · true
+    ✔ Install Playwright browsers (can be done manually via 'npx playwright install')? (Y/n) · true
+    Installing Playwright Test (npm install --save-dev @playwright/test)…
+
+    added 3 packages, changed 1 package, and audited 9 packages in 8s
+
+    found 0 vulnerabilities
+    Installing Types (npm install --save-dev @types/node)…
+
+    added 1 package, changed 1 package, and audited 10 packages in 2s
+
+    found 0 vulnerabilities
+    Writing playwright.config.ts.
+    Writing .github/workflows/playwright.yml.
+    Writing e2e/example.spec.ts.
+    Writing package.json.
+    Downloading browsers (npx playwright install)…
+    ✔ Success! Created a Playwright Test project at /Users/kazurayam/$REPO/myAPIserver
+
+    Inside that directory, you can run several commands:
+
+      npx playwright test
+        Runs the end-to-end tests.
+
+      npx playwright test --ui
+        Starts the interactive UI mode.
+
+      npx playwright test --project=chromium
+        Runs the tests only on Desktop Chrome.
+
+      npx playwright test example
+        Runs the tests in a specific file.
+
+      npx playwright test --debug
+        Runs the tests in debug mode.
+
+      npx playwright codegen
+        Auto generate tests with Codegen.
+
+    We suggest that you begin by typing:
+
+        npx playwright test
+
+    And check out the following files:
+      - ./tests/example.spec.ts - Example end-to-end test
+      - ./playwright.config.ts - Playwright Test configuration
+
+    Visit https://playwright.dev/docs/intro for more information. ✨
+
+    Happy hacking! 🎭
+
+`bun create` コマンドを実行したが、内部的にはnpmが使われているようだ。Playwrightのインストールが完了したら `bun install` コマンドを実行して `package.json` を更新しよう。
+
+    $ cd $REPO/myWEBserver
+    $ bun install
+
+#### E2Eテストコードを書く
+
+[e2e/index.spec.ts](https://github.com/kazurayam/KzHonoProjectBase/blob/master/myWEBserver/e2e/example.spec.ts) を書いた。
+
+    import { test, expect } from '@playwright/test';
+
+    test('has title', async ({ page }) => {
+      await page.goto('https://playwright.dev/');
+
+      // Expect a title "to contain" a substring.
+      await expect(page).toHaveTitle(/Playwright/);
+    });
+
+    test('get started link', async ({ page }) => {
+      await page.goto('https://playwright.dev/');
+
+      // Click the get started link.
+      await page.getByRole('link', { name: 'Get started' }).click();
+
+      // Expects page to have a heading with the name of Installation.
+      await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+    });
+
+### E2Eテストを実行する
+
+[myWEBserver/package.json](https://github.com/kazurayam/KzHonoProjectBase/blob/master/myWEBserver/package.json) の `scripts` セクションに `e2e` サブコマンドと `show` サブコマンドを追加した。
+
+      "scripts": {
+        "dev": "bun run --hot src/index.tsx",
+        "e2e": "bunx playwright test",
+        "show": "bunx playwright show-report"
+      },
+
+PlaywrightのE2Eテストを実行しよう。
+
+    $ cd $REPO/myWEBserver
+    $ bun e2e
+    $ bunx playwright test
+
+    Running 9 tests using 4 workers
+      9 passed (11.9s)
+
+    To open last HTML report run:
+
+      npx playwright show-report
+
+\`bun report\`コマンドを実行するとPlaywrightが生成したHTMLレポートがブラウザで開かれる。
+
+<figure>
+<img src="https://kazurayam.github.io/KzHonoProjectBase/images/myWEBserver_2_show-report.png" alt="myWEBserver 2 show report" />
+</figure>
+
+myWEBserverに対するE2Eテストが動いた。
 
 ## エッジサーバに配備しよう
+
+myWEBserverをCloudFlare Workersに配備しよう。次のドキュメントを参考にした。
+
+- [Hono公式ドキュメント "Cloudflare Workers"](https://hono.dev/docs/deployments/cloudflare-workers)
+
+### Cloudflareに自分用のアカウントを作成する
+
+ブラウザで下記のURLを開きCloundflareアカウントを登録した。
+
+- <https://dash.cloudflare.com/sign-up/workers-and-pages>
+
+<figure>
+<img src="https://kazurayam.github.io/KzHonoProjectBase/images/Cloudflare-Dashboard-Manage-Your-Account.png" alt="Cloudflare Dashboard Manage Your Account" />
+</figure>
+
+CloudFlare Workersのアカウントを作成し、APIトークンを取得しよう。
+
+OSの環境変数 `CLOUDFLARE_API_TOKEN` を作ってそこにAPIトークンを設定しよう。`.bash_profile` に書いておくと良い。
+
+### CloudFlare Workersの設定を行う
+
+CloudFlareのダッシュボードでWorkersの設定を行う。
+
+### wranglerをインストールする
+
+`wrangler` CLIをインストールしよう。
+
+    $ bun install -g wrangler
+    bun install v1.3.4 (5eb2145b)
+    + wrangler@2.11.3
+    1 package installed [123.00ms]
+
+### プロジェクトをCloudFlare Workersに配備する
+
+`myWEBserver/wrangler.toml` を書いた。
+
+    Unresolved directive in index_.adoc - include::../myWEBserver/wrangler.toml[]
