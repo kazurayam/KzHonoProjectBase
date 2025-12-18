@@ -636,8 +636,8 @@ Playwrightをインストールして、設定ファイルとサンプルコー�
       "scripts": {
         "dev": "bun run --hot src/index.tsx",
         "e2e": "bunx playwright test",
-        "show": "bunx playwright show-report"
-      },
+        "show": "bunx playwright show-report",
+        "start": "wrangler dev src/index.tsx",
 
 PlaywrightのE2Eテストを実行しよう。
 
@@ -662,9 +662,9 @@ myWEBserverに対するE2Eテストが動いた。
 
 ## エッジサーバに配備しよう
 
-myWEBserverをCloudFlare Workersに配備しよう。次のドキュメントを参考にした。
+myWEBserverを link:CloudFlare Workersに配備しよう。次のドキュメントを参考にした。
 
-- [Hono公式ドキュメント "Cloudflare Workers"](https://hono.dev/docs/deployments/cloudflare-workers)
+- [Cloudflare Workers with Hono on bun を試す](https://zenn.dev/watsuyo_2/scraps/76e60a75ada45e)
 
 ### Cloudflareに自分用のアカウントを作成する
 
@@ -672,29 +672,71 @@ myWEBserverをCloudFlare Workersに配備しよう。次のドキュメントを
 
 - <https://dash.cloudflare.com/sign-up/workers-and-pages>
 
-<figure>
-<img src="https://kazurayam.github.io/KzHonoProjectBase/images/Cloudflare-Dashboard-Manage-Your-Account.png" alt="Cloudflare Dashboard Manage Your Account" />
-</figure>
+わたくしkazurayamはGitHubアカウントを持っている。CloudflareアカウントをGitHubアカウントに連携させる形をとった。
 
-CloudFlare Workersのアカウントを作成し、APIトークンを取得しよう。
+APIトークンを取得しよう。
 
-OSの環境変数 `CLOUDFLARE_API_TOKEN` を作ってそこにAPIトークンを設定しよう。`.bash_profile` に書いておくと良い。
+- <https://dash.cloudflare.com/profile/api-tokens>
 
-### CloudFlare Workersの設定を行う
+ここで "Edit Cloudflare Workers" のテンプレートを使って "KzHonoProjectBase" という名前のAPIトークンを作った。
 
-CloudFlareのダッシュボードでWorkersの設定を行う。
+OSの環境変数 `CLOUDFLARE_API_TOKEN_KzHonoProjectBase` を作ってそこにAPIトークンを設定しよう。`.bash_profile` に書いておくと良い。
 
 ### wranglerをインストールする
 
 `wrangler` CLIをインストールしよう。
 
-    $ bun install -g wrangler
-    bun install v1.3.4 (5eb2145b)
-    + wrangler@2.11.3
-    1 package installed [123.00ms]
+    $ cd $REPO/myWEBserver
+    $ bun add -d @cloudflare/workers-types wrangler
+    bun add v1.3.4 (5eb2145b)
+
+    installed @cloudflare/workers-types@4.20251217.0
+    installed wrangler@4.55.0 with binaries:
+     - wrangler
+     - wrangler2
+
+    48 packages installed [43.57s]
+    $ wrangler -v
+
+     ⛅️ wrangler 4.55.0
+
+`package.json` に `start` サブコマンドと `deploy` サブコマンドを追加した。
+
+      "scripts": {
+        "dev": "bun run --hot src/index.tsx",
+        "e2e": "bunx playwright test",
+        "show": "bunx playwright show-report",
+        "start": "wrangler dev src/index.tsx",
+        "deploy": "wrangler deploy --minify src/index.tsx"
+      },
+
+### Cloudflare Workersをローカルでシュミレートしてみる
+
+    $ bun run start
+    $ wrangler dev src/index.tsx
+
+     ⛅️ wrangler 4.55.0
+    ───────────────────
+    ╭──────────────────────────────────────────────────────────────────────╮
+    │  [b] open a browser [d] open devtools [c] clear console [x] to exit  │
+    ╰──────────────────────────────────────────────────────────────────────╯
+    ⎔ Starting local server...
+    [wrangler:info] Ready on http://localhost:8787
+
+ブラウザで <http://localhost:8787> を開くと予想通りの画面が見えた。
+
+<figure>
+<img src="https://kazurayam.github.io/KzHonoProjectBase/images/myWEBserver_3_wrangler_dev.png" alt="myWEBserver 3 wrangler dev" />
+</figure>
 
 ### プロジェクトをCloudFlare Workersに配備する
 
 `myWEBserver/wrangler.toml` を書いた。
 
     Unresolved directive in index_.adoc - include::../myWEBserver/wrangler.toml[]
+
+### GitHub Actionで自動的にデプロイできるようにする
+
+<https://kasaharu.hatenablog.com/entry/20230904/1693831653> を参考にした
+
+[Wrangler GitHub Action](https://github.com/marketplace/actions/deploy-to-cloudflare-workers-with-wrangler)

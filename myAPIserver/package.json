@@ -3,7 +3,9 @@
   "scripts": {
     "dev": "bun run --hot src/server.ts",
     "client": "bun run --hot src/client.ts",
-    "test": "bun test"
+    "test": "bun test",
+    "start": "wrangler dev src/server.ts",
+    "deploy": "wrangler deploy --minify src/server.ts"
   },
   "dependencies": {
     "@hono/swagger-ui": "^0.5.2",
