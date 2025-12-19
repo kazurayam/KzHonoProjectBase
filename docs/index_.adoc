@@ -599,14 +599,42 @@ image::{PAGE_TOP_URL}/images/myWEBserver_7_index_on_worker.png[]
 
 == CI/CDしよう
 
-コマンドラインで `bun run deploy` を実行してローカルに配備する方法でも画面の表示確認はできる。しかし配備した後にE2Eテストを必ず実行したい。それを何度も繰り返したい。そうなるとコマンドを実行し結果を待つ手間と時間がつら苦なる。配備とE2Eテストを自動的に実行するためにCI/CD環境を構築しよう。GitHub Actionで実現したい。
+コマンドラインで `bun run deploy` とタイプしてアプリを配備することができる。ブラウザでURLを問い合わせて画面が応答されるのを黙示確認できる。しかしそれではまだ足りない。配備した後にE2Eテストを必ず実行したい。それを何度も繰り返したい。すると手動でコマンドを実行し結果を待つのが辛くなる。配備とテストの実行を自動化したい。そのためにCI/CD環境を構築しよう。GitHub Actionを利用しよう。
 
-https://kasaharu.hatenablog.com/entry/20230904/1693831653 を参考にした
+link:https://zenn.dev/umaidashi/articles/d1097ef5c9af50["hono(bun)をcloudflare workersにGitHub actions ci/cdで自動デプロイ"]
 
-link:https://github.com/marketplace/actions/deploy-to-cloudflare-workers-with-wrangler[Wrangler GitHub Action]
+を参考にした
 
-APIトークンを取得しよう。
+=== Cloundflare APIトークンを取得する
 
 - link:https://dash.cloudflare.com/profile/api-tokens[]
 
 ここで "Edit Cloudflare Workers" のテンプレートを使って "KzHonoProjectBase" という名前のAPIトークンを作った。
+
+=== APIトークンをGitHubレポジトリのSecretとして登録する
+
+link:https://github.com/kazurayam/KzHonoProjectBase/[KzHonoProjectBase] レポジトリで Settings > Secrets and variables > Actions のメニューをたどり、New repository secret のボタンを押した。
+
+Nameを `CLOUDFLARE_API_TOKEN` として、先に取得したAPIトークンを設定した。
+
+こうしておくとGitHub Actionsのymlファイルで `secrets.CLOUDFLARE_API_TOKEN` と記述することでAPIトークンの値を参照することができる。
+
+=== GitHub Actionsを設定する
+
+`myWEBserver` プロジェクトのルートディレクトリの下に `.github/workflows` ディレクトリを作った。そこに `deploy.yml` ファイルを作った。
+
+[source,yaml]
+----
+include::../myWEBserver/.github/workflows/deploy.yml[]
+----
+
+masterブランチにpushすると自動的にデプロイされるはずだ。
+
+=== ユニットテストとE2EテストをGitHub Actionで実行する
+
+`./workflows/deploy.yml` のなかに `bun test` と `bun e2e` を付け加えた。これでユニットテストとPlaywrightによるE2Eテストが自動的に実行されるはずだ。
+
+疑問：もしもテストでエラーが発生したらエラーの詳細を見たくなる。どうやって見ればいいのか？
+
+
+

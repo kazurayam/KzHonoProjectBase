@@ -791,14 +791,69 @@ Cloudflareのコンソールを見ると新しいdeploymentが作成されてい
 
 ## CI/CDしよう
 
-コマンドラインで `bun run deploy` を実行してローカルに配備する方法でも画面の表示確認はできる。しかし配備した後にE2Eテストを必ず実行したい。それを何度も繰り返したい。そうなるとコマンドを実行し結果を待つ手間と時間がつら苦なる。配備とE2Eテストを自動的に実行するためにCI/CD環境を構築しよう。GitHub Actionで実現したい。
+コマンドラインで `bun run deploy` とタイプしてアプリを配備することができる。ブラウザでURLを問い合わせて画面が応答されるのを黙示確認できる。しかしそれではまだ足りない。配備した後にE2Eテストを必ず実行したい。それを何度も繰り返したい。すると手動でコマンドを実行し結果を待つのが辛くなる。配備とテストの実行を自動化したい。そのためにCI/CD環境を構築しよう。GitHub Actionを利用しよう。
 
-<https://kasaharu.hatenablog.com/entry/20230904/1693831653> を参考にした
+["hono(bun)をcloudflare workersにGitHub actions ci/cdで自動デプロイ"](https://zenn.dev/umaidashi/articles/d1097ef5c9af50)
 
-[Wrangler GitHub Action](https://github.com/marketplace/actions/deploy-to-cloudflare-workers-with-wrangler)
+を参考にした
 
-APIトークンを取得しよう。
+### Cloundflare APIトークンを取得する
 
 - <https://dash.cloudflare.com/profile/api-tokens>
 
 ここで "Edit Cloudflare Workers" のテンプレートを使って "KzHonoProjectBase" という名前のAPIトークンを作った。
+
+### APIトークンをGitHubレポジトリのSecretとして登録する
+
+[KzHonoProjectBase](https://github.com/kazurayam/KzHonoProjectBase/) レポジトリで Settings &gt; Secrets and variables &gt; Actions のメニューをたどり、New repository secret のボタンを押した。
+
+Nameを `CLOUDFLARE_API_TOKEN` として、先に取得したAPIトークンを設定した。
+
+こうしておくとGitHub Actionsのymlファイルで `secrets.CLOUDFLARE_API_TOKEN` と記述することでAPIトークンの値を参照することができる。
+
+### GitHub Actionsを設定する
+
+`myWEBserver` プロジェクトのルートディレクトリの下に `.github/workflows` ディレクトリを作った。そこに `deploy.yml` ファイルを作った。
+
+    name: Deploy
+
+    on:
+        push:
+            branches:
+                - master
+                - develop
+        pull_request:
+            branches:
+                - master
+                - develop
+
+    jobs:
+        deploy:
+            runs-on: ubuntu-latest
+            name: Deploy
+            steps:
+                - name: Checkout
+                  uses: actions/checkout@v4
+
+                - name: Setup Bun
+                  uses: oven-sh/setup-bun@v1
+
+                - name: Install dependencies
+                  run: bun install
+
+                - name: Deploy
+                  uses: cloudflare/wrianger-action@v3
+                  with:
+                    apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+                - name: unit-test
+                  run: bun test
+
+                - name: E2E test
+                  run: bun e2e
+
+masterブランチにpushすると自動的にデプロイされるはずだ。
+
+### ユニットテストとE2EテストをGitHub Actionで実行する
+
+…​
