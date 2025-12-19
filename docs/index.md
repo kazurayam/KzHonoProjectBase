@@ -7,7 +7,7 @@
 
 - date: Dec, 2025
 
-わたくしkazurayamがこれからHonoを使ったプロジェクトを自作するにあたって雛形として役立つプロジェクトを作り、GitHubリポジトリにしました。Bun、Hono、JSXなど基盤となるソフトウェアをインストールし、プロジェクトを作って、サンプルとしてのアプリが動作することを確認するまでの手順をまとめています。
+わたくしkazurayamがこれからHonoを使ったプロジェクトを自作するにあたって雛形として役立つコード集を作りました。Bun、Hono、JSXなど基盤となるソフトウェアをインストールし、プロジェクトを作って、サンプルとしてのアプリが動作することを確認するまでの手順をまとめています。今後、学んだノウハウをここに記録していって自分のネタ本にしようと思います。
 
 ## KzHonoProjectBaseの概要
 
@@ -25,9 +25,9 @@
 
 7.  サーバーサイドでJSXをレンダリングする。そのためにReactは無くても大丈夫だからReactは使わない。
 
-8.  ユニットテストをする。Bunの組み込みテストフレームワークを使用する。
+8.  ユニットテストをする。Bunの組み込みテストフレームワークを使う。
 
-9.  E2Eテストをする。Playwrightを使用する。
+9.  E2Eテストをする。Playwrightを使う。
 
 10. サンプルアプリをエッジサーバーへ配備する。CloudFlare Worksを使う。
 
@@ -660,7 +660,7 @@ PlaywrightのE2Eテストを実行しよう。
 
 myWEBserverに対するE2Eテストが動いた。
 
-## エッジサーバに配備しよう
+## Deployしよう
 
 myWEBserverを link:CloudFlare Workersに配備しよう。次のドキュメントを参考にした。
 
@@ -732,7 +732,7 @@ myWEBserverを link:CloudFlare Workersに配備しよう。次のドキュメン
 <img src="https://kazurayam.github.io/KzHonoProjectBase/images/myWEBserver_3_wrangler_dev.png" alt="myWEBserver 3 wrangler dev" />
 </figure>
 
-## プロジェクトをCloudFlare Workersに配備する
+### プロジェクトをエッジサーバーに配備する
 
 CloudFlare Workestにアプリを配備するためには `wrangler.toml` を書く必要がある。 `myWEBserver/wrangler.toml` を書いた。
 
@@ -789,9 +789,9 @@ Cloudflareのコンソールを見ると新しいdeploymentが作成されてい
 
 ああ、たしかにCloudflare Worksの上にわたしが自作したwebアプリがデプロイされている。成功だ。
 
-## GitHub ActionでWranglerを動かしてデプロイできるようにする
+## CI/CDしよう
 
-コマンドラインで `bun run deploy` を実行する方法でもいいが、それに加えてCI/CD環境を構築したいものだ。GitHub Actionで実現したい。
+コマンドラインで `bun run deploy` を実行してローカルに配備する方法でも画面の表示確認はできる。しかし配備した後にE2Eテストを必ず実行したい。それを何度も繰り返したい。そうなるとコマンドを実行し結果を待つ手間と時間がつら苦なる。配備とE2Eテストを自動的に実行するためにCI/CD環境を構築しよう。GitHub Actionで実現したい。
 
 <https://kasaharu.hatenablog.com/entry/20230904/1693831653> を参考にした
 
