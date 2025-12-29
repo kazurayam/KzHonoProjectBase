@@ -162,6 +162,27 @@ link:{REPOSITORY_myAPIserver_URL}/src/server.ts[myAPIserver/src/server.ts]
 include::../myAPIserver/src/server.ts[]
 ----
 
+このコードは `@hono/zod-openapi` と link://https://github.com/honojs/middleware/tree/main/packages/swagger-ui[`@hono/swagger-ui`] をimportしている。これを成功させるには外部依存性を解決する必要がある。
+
+[source,shell]
+----
+$ bun install zod @hono/zod-openapi
+----
+
+そして
+
+[source,shell]
+----
+$ bun install @hono/swagger-ui
+----
+
+`package.json` がこうなる。
+
+[source,json]
+----
+include::../myAPIserver/package.json[]
+----
+
 ターミナルで次のコマンドを実行しよう。HTTPサーバが立ち上がる。
 
 ```
@@ -218,7 +239,10 @@ $ bun client
 
 === ユニットテストをする
 
-`src/server.ts` をユニットテストしよう。Bunに組み込まれたtestライブラリを使おう。 `src/server.test.ts` を書いた。
+`src/server.ts` をユニットテストしよう。Bunに組み込まれたtestライブラリを使おう。
+
+
+`src/server.test.ts` を書いた。
 
 [source,typescript]
 ----
@@ -249,6 +273,13 @@ Ran 2 tests across 1 file. [49.00ms]
 link:https://hono.dev/docs/guides/jsx[Hono公式ドキュメント "JSX"] のサンプルコードをコピペした。
 
 === ライブラリをインストールする
+
+`package.json` はこうなっている。
+
+[source,json]
+----
+include::../myWEBserver/package.json[]
+----
 
 `bun install` コマンドを実行してライブラリをインストールしよう。
 

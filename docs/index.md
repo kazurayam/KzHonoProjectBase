@@ -253,6 +253,35 @@ $REPO の中で下記のコマンドを実行する。
 
     export default app
 
+このコードは `@hono/zod-openapi` と [`@hono/swagger-ui`](//https://github.com/honojs/middleware/tree/main/packages/swagger-ui) をimportしている。これを成功させるには外部依存性を解決する必要がある。
+
+    $ bun install zod @hono/zod-openapi
+
+そして
+
+    $ bun install @hono/swagger-ui
+
+`package.json` がこうなる。
+
+    {
+      "name": "myAPIserver",
+      "scripts": {
+        "dev": "bun run --hot src/server.ts",
+        "client": "bun run --hot src/client.ts",
+        "test": "bun test",
+        "start": "wrangler dev src/server.ts",
+        "deploy": "wrangler deploy --minify src/server.ts"
+      },
+      "dependencies": {
+        "@hono/swagger-ui": "^0.5.2",
+        "@hono/zod-openapi": "^1.1.5",
+        "hono": "^4.10.7"
+      },
+      "devDependencies": {
+        "@types/bun": "latest"
+      }
+    }
+
 ターミナルで次のコマンドを実行しよう。HTTPサーバが立ち上がる。
 
     $ cd $REPO/myAPIserver
@@ -329,7 +358,9 @@ APIクライアントを作ろう。 `src/client.ts` を書いた。
 
 ### ユニットテストをする
 
-`src/server.ts` をユニットテストしよう。Bunに組み込まれたtestライブラリを使おう。 `src/server.test.ts` を書いた。
+`src/server.ts` をユニットテストしよう。Bunに組み込まれたtestライブラリを使おう。
+
+`src/server.test.ts` を書いた。
 
     import { describe, expect, test } from 'bun:test';
     import { testClient } from 'hono/testing';
@@ -381,6 +412,33 @@ APIクライアントを作ろう。 `src/client.ts` を書いた。
 [Hono公式ドキュメント "JSX"](https://hono.dev/docs/guides/jsx) のサンプルコードをコピペした。
 
 ### ライブラリをインストールする
+
+`package.json` はこうなっている。
+
+    {
+      "name": "myWEBserver",
+      "scripts": {
+        "dev": "bun run --hot src/index.tsx",
+        "e2e": "bunx playwright test",
+        "show": "bunx playwright show-report",
+        "start": "wrangler dev src/index.tsx",
+        "deploy": "wrangler deploy --minify src/index.tsx"
+      },
+      "dependencies": {
+        "hono": "^4.10.7"
+      },
+      "devDependencies": {
+        "@cloudflare/workers-types": "^4.20251217.0",
+        "@happy-dom/global-registrator": "^20.0.11",
+        "@playwright/test": "^1.57.0",
+        "@testing-library/dom": "^10.4.1",
+        "@types/bun": "latest",
+        "@types/node": "^24.10.1",
+        "happy-dom": "^20.0.11",
+        "playwright": "^1.57.0",
+        "wrangler": "^4.55.0"
+      }
+    }
 
 `bun install` コマンドを実行してライブラリをインストールしよう。
 
@@ -856,4 +914,6 @@ masterブランチにpushすると自動的にデプロイされるはずだ。
 
 ### ユニットテストとE2EテストをGitHub Actionで実行する
 
-…​
+`./workflows/deploy.yml` のなかに `bun test` と `bun e2e` を付け加えた。これでユニットテストとPlaywrightによるE2Eテストが自動的に実行されるはずだ。
+
+疑問：もしもテストでエラーが発生したらエラーの詳細を見たくなる。どうやって見ればいいのか？
