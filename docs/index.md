@@ -255,7 +255,7 @@ $REPO の中で下記のコマンドを実行する。
 
 このコードは `@hono/zod-openapi` と [`@hono/swagger-ui`](//https://github.com/honojs/middleware/tree/main/packages/swagger-ui) をimportしている。これを成功させるには外部依存性を解決する必要がある。
 
-    $ bun install zod @hono/zod-openapi
+    $ bun install @hono/zod-openapi
 
 そして
 

@@ -166,7 +166,7 @@ include::../myAPIserver/src/server.ts[]
 
 [source,shell]
 ----
-$ bun install zod @hono/zod-openapi
+$ bun install @hono/zod-openapi
 ----
 
 そして
