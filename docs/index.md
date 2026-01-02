@@ -253,14 +253,12 @@ $REPO の中で下記のコマンドを実行する。
 
     export default app
 
-このコードは `@hono/zod-openapi` と [`@hono/swagger-ui`](//https://github.com/honojs/middleware/tree/main/packages/swagger-ui) をimportしている。これを成功させるには\`myAPIプロジェクト\`の外部依存性を解決する必要がある。
+このコードは `@hono/zod-openapi` と [`@hono/swagger-ui`](//https://github.com/honojs/middleware/tree/main/packages/swagger-ui) をimportしている。これを成功させるには `myAPIserver` プロジェクトの外部依存性を解決する必要がある。
 
 まずプロジェクトにcdする
 
-    ---
     $ cd KzHonoProjectBase
     $ cd myAPIserver
-    ----
 
 そして
 

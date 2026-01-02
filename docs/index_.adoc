@@ -162,11 +162,12 @@ link:{REPOSITORY_myAPIserver_URL}/src/server.ts[myAPIserver/src/server.ts]
 include::../myAPIserver/src/server.ts[]
 ----
 
-このコードは `@hono/zod-openapi` と link://https://github.com/honojs/middleware/tree/main/packages/swagger-ui[`@hono/swagger-ui`] をimportしている。これを成功させるには`myAPIプロジェクト`の外部依存性を解決する必要がある。
+このコードは `@hono/zod-openapi` と link://https://github.com/honojs/middleware/tree/main/packages/swagger-ui[`@hono/swagger-ui`] をimportしている。これを成功させるには `myAPIserver` プロジェクトの外部依存性を解決する必要がある。
 
 まずプロジェクトにcdする
+
 [source,shell]
----
+----
 $ cd KzHonoProjectBase
 $ cd myAPIserver
 ----
